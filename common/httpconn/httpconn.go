@@ -3,6 +3,7 @@ package httpconn
 import (
 	"bytes"
 	"context"
+	"strings"
 	"encoding/json"
 	"github.com/block-vision/sui-go-sdk/models"
 	"io/ioutil"
@@ -43,10 +44,13 @@ func NewCustomHttpConn(rpcUrl string, cli *http.Client) *HttpConn {
 }
 
 func (h *HttpConn) Request(ctx context.Context, op Operation) ([]byte, error) {
+	method := op.Method
+	method = strings.Replace(method, "sui_", "bfc_", 1)
+	method = strings.Replace(method, "suix_", "bfcx_", 1)
 	jsonRPCReq := models.JsonRPCRequest{
 		JsonRPC: "2.0",
 		ID:      time.Now().UnixMilli(),
-		Method:  op.Method,
+		Method:  method,
 		Params:  op.Params,
 	}
 	reqBytes, err := json.Marshal(jsonRPCReq)
